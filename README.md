@@ -29,7 +29,7 @@ This project provides Python bindings for controlling Hikvision industrial camer
 
 1.  **Clone the repository:**
     ```bash
-    git clone <your-repository-url>
+    git clone https://github.com/hwutum/hikvision_python_api.git
     cd hikvision_fork
     ```
 
