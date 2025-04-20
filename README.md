@@ -30,7 +30,7 @@ This project provides Python bindings for controlling Hikvision industrial camer
 1.  **Clone the repository:**
     ```bash
     git clone https://github.com/hwutum/hikvision_python_api.git
-    cd hikvision_fork
+    cd hikvision_python_api
     ```
 
 2.  **Configure SDK Path:**
@@ -57,54 +57,6 @@ This project provides Python bindings for controlling Hikvision industrial camer
     *   This will compile the C++ code and create the Python binding module (e.g., `hikvision_camera.cpython-3x-x86_64-linux-gnu.so`) inside the `build` directory.
 
 ## Usage
-
-Once built, you can import the `hikvision_camera` module in Python. The `cameras/hikvision.py` file provides a higher-level class interface.
-
-**Example using `cameras/hikvision.py`:**
-
-```python
-# Ensure the 'build' directory is accessible or added to sys.path
-# (cameras/hikvision.py attempts to do this automatically)
-from cameras.hikvision import HikvisionCamera, HikvisionCameraConfig
-import cv2 # For display
-
-# Configure the camera (use defaults or specify)
-config = HikvisionCameraConfig(width=1440, height=1080, color_mode="rgb")
-camera = HikvisionCamera(config)
-
-try:
-    print("Connecting...")
-    camera.connect()
-    print("Connected.")
-
-    # --- Synchronous Read ---
-    # print("Reading one frame (sync)...")
-    # frame = camera.read()
-    # print(f"Frame shape: {frame.shape}")
-    # cv2.imshow("Sync Frame", frame if config.color_mode == "bgr" else cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))
-    # cv2.waitKey(0)
-
-    # --- Asynchronous Read ---
-    print("Reading frames (async)... Press 'q' to quit.")
-    while True:
-        frame = camera.async_read() # Get latest frame
-
-        # Display (convert to BGR if needed for cv2)
-        display_frame = frame if config.color_mode == "bgr" else cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-        cv2.imshow("Async Frame", display_frame)
-
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-
-except Exception as e:
-    print(f"An error occurred: {e}")
-finally:
-    print("Disconnecting...")
-    camera.disconnect()
-    cv2.destroyAllWindows()
-    print("Done.")
-
-```
 
 **Directly using the compiled module (Lower Level):**
 
@@ -158,14 +110,3 @@ cam.close()
 cv2.destroyAllWindows()
 print("Finished.")
 ```
-
-## Testing Script
-
-You can use the command-line interface provided in `cameras/hikvision.py` to quickly test the camera connection and save some frames:
-
-```bash
-# Run from the project root directory
-python cameras/hikvision.py --images-dir ./hik_test_images --record-time-s 5 --width 1280 --height 720
-```
-
-This will connect to the camera, record for 5 seconds at 1280x720 resolution, and save PNG images to the `hik_test_images` directory.
