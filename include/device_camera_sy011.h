@@ -16,14 +16,17 @@ public:
     bool set_exposure_time(int exposure_time);
     bool start_grabbing();
     void stop_grabbing();
-    bool capture_image(unsigned char* pData, MV_FRAME_OUT_INFO_EX& frameInfo);  // Implement this method
+    bool capture_image(unsigned char* pData, MV_FRAME_OUT_INFO_EX& frameInfo);
     void close() override;
+
+    // Add method to get FPS
+    float get_fps();
 
     // Image callback
     static void image_callback(unsigned char* pData, MV_FRAME_OUT_INFO_EX& frameInfo, void* pUser);
 
 private:
-    bool openDevice();  // 设备打开函数
+    bool openDevice();
     void image_callback_handler(unsigned char* pData, MV_FRAME_OUT_INFO_EX& frameInfo);
 
     // 加锁保护的成员变量

@@ -63,11 +63,12 @@ PYBIND11_MODULE(hikvision_camera, m) {
         .def(py::init<>()) // Bind constructor
         .def("init", &PyDeviceCameraSY011::init, "Initialize the camera SDK and find devices")
         .def("set_resolution", &PyDeviceCameraSY011::set_resolution, "Set camera resolution", py::arg("width"), py::arg("height"))
-        // .def("set_exposure_time", &PyDeviceCameraSY011::set_exposure_time, "Set camera exposure time", py::arg("exposure_time")) // Uncomment if needed
+        .def("set_exposure_time", &PyDeviceCameraSY011::set_exposure_time, "Set camera exposure time", py::arg("exposure_time")) // Uncommented as per suggestion
         .def("start_grabbing", &PyDeviceCameraSY011::start_grabbing, "Start image grabbing")
         .def("stop_grabbing", &PyDeviceCameraSY011::stop_grabbing, "Stop image grabbing")
         .def("capture_image", &PyDeviceCameraSY011::capture_image_py, "Capture an image and return as NumPy array (success_flag, image_array)")
-        .def("close", &PyDeviceCameraSY011::close, "Close the device and release SDK resources");
+        .def("close", &PyDeviceCameraSY011::close, "Close the device and release SDK resources")
+        .def("get_fps", &PyDeviceCameraSY011::get_fps, "Get the current frame rate reported by the camera (ResultingFrameRate/AcquisitionFrameRate)"); // Added as per suggestion
 
     // You might need to bind constants or enums from MvCameraControl.h if your Python code needs them
     // Example: m.attr("MV_OK") = py::int_(MV_OK);

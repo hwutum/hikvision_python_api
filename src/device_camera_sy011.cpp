@@ -2,6 +2,7 @@
 
 #include "device_camera_sy011.h"
 #include <iostream>
+#include <string> // Required for std::string
 
 DeviceCameraSY011::DeviceCameraSY011() : DeviceCamera() {}
 
@@ -111,8 +112,46 @@ void DeviceCameraSY011::stop_grabbing() {
 }
 
 bool DeviceCameraSY011::capture_image(unsigned char* pData, MV_FRAME_OUT_INFO_EX& frameInfo) {
-    int nRet = MV_CC_GetOneFrameTimeout(handle, pData, 4024 * 3036, &frameInfo, 1000);
+    // Increased buffer size assumption for safety, adjust if needed based on max resolution
+    int nRet = MV_CC_GetOneFrameTimeout(handle, pData, 1440 * 1080 * 3 + 2048, &frameInfo, 1000); // Added buffer margin
+    if (nRet != MV_OK) {
+         // Optionally print error code here
+         // std::cerr << "MV_CC_GetOneFrameTimeout failed! Error Code: [0x" << std::hex << nRet << "]" << std::endl;
+    }
     return nRet == MV_OK;
+}
+
+float DeviceCameraSY011::get_fps() {
+    if (!handle) {
+        std::cerr << "Error: Camera handle is not valid for getting FPS." << std::endl;
+        return -1.0f; // Indicate error: Not connected or initialized
+    }
+
+    MVCC_FLOATVALUE stFloatValue = {0};
+    int nRet = MV_OK;
+    // Parameter names can vary. Common ones are "ResultingFrameRate" or "AcquisitionFrameRate".
+    // Check your camera's documentation or MVS client software for the exact name.
+    const char* fpsParamName1 = "ResultingFrameRate";
+    const char* fpsParamName2 = "AcquisitionFrameRate";
+
+    // Try the first parameter name
+    nRet = MV_CC_GetFloatValue(handle, fpsParamName1, &stFloatValue);
+    if (nRet != MV_OK) {
+        // If the first one failed, try the second one
+        // std::cerr << "Warning: Failed to get FPS using '" << fpsParamName1 << "'. Trying '" << fpsParamName2 << "'... Error Code: [0x" << std::hex << nRet << "]" << std::endl;
+        nRet = MV_CC_GetFloatValue(handle, fpsParamName2, &stFloatValue);
+        if (nRet != MV_OK) {
+            // If both failed, report the error for the second attempt
+            std::cerr << "Failed to get FPS using '" << fpsParamName1 << "' or '" << fpsParamName2 << "'! Error Code: [0x" << std::hex << nRet << "]" << std::endl;
+            return -2.0f; // Indicate error: Parameter not found or other SDK error
+        }
+         // std::cout << "Successfully retrieved FPS using parameter: " << fpsParamName2 << std::endl;
+    } else {
+         // std::cout << "Successfully retrieved FPS using parameter: " << fpsParamName1 << std::endl;
+    }
+
+
+    return stFloatValue.fCurValue;
 }
 
 void DeviceCameraSY011::close() {
